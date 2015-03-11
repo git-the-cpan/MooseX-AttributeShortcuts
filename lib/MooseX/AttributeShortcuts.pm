@@ -9,8 +9,8 @@
 #
 package MooseX::AttributeShortcuts;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-# git description: 0.025-1-gaeff45b
-$MooseX::AttributeShortcuts::VERSION = '0.026'; # TRIAL
+# git description: 0.026-4-g9655ffa
+$MooseX::AttributeShortcuts::VERSION = '0.027';
 
 # ABSTRACT: Shorthand for common attribute options
 
@@ -27,16 +27,14 @@ use Moose::Util::TypeConstraints;
 {
     package MooseX::AttributeShortcuts::Trait::Attribute;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-# git description: 0.025-1-gaeff45b
-$MooseX::AttributeShortcuts::Trait::Attribute::VERSION = '0.026'; # TRIAL
+# git description: 0.026-4-g9655ffa
+$MooseX::AttributeShortcuts::Trait::Attribute::VERSION = '0.027';
     use namespace::autoclean;
     use MooseX::Role::Parameterized;
     use Moose::Util::TypeConstraints  ':all';
     use MooseX::Types::Moose          ':all';
     use MooseX::Types::Common::String ':all';
 
-    use autobox::Core;
-    use autobox::Junctions;
     use List::AllUtils 'any';
 
     use Package::DeprecationManager -deprecations => {
@@ -117,12 +115,12 @@ $MooseX::AttributeShortcuts::Trait::Attribute::VERSION = '0.026'; # TRIAL
                 }
             }
 
-            if (any { $options->keys->any eq $_ } (qw{ isa_class isa_role isa_enum })) {
+            if (any { exists $options->{$_} } (qw{ isa_class isa_role isa_enum })) {
 
                 # (more than) fair warning...
                 deprecated(
                     feature => 'undocumented-isa-constraints',
-                    message => 'Naughty! isa_class, isa_role, and isa_enum will be removed on or after 01 July 2014!',
+                    message => 'Naughty! isa_class, isa_role, and isa_enum will be removed on or after 01 July 2015!',
                 );
 
                 # XXX undocumented -- not sure this is a great idea
@@ -408,7 +406,7 @@ MooseX::AttributeShortcuts - Shorthand for common attribute options
 
 =head1 VERSION
 
-This document describes version 0.026 of MooseX::AttributeShortcuts - released December 02, 2014 as part of MooseX-AttributeShortcuts.
+This document describes version 0.027 of MooseX::AttributeShortcuts - released March 10, 2015 as part of MooseX-AttributeShortcuts.
 
 =head1 SYNOPSIS
 
