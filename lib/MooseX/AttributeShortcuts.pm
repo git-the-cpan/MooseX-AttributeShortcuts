@@ -9,8 +9,8 @@
 #
 package MooseX::AttributeShortcuts;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-# git description: 0.026-4-g9655ffa
-$MooseX::AttributeShortcuts::VERSION = '0.027';
+# git description: 0.027-9-g78dcc28
+$MooseX::AttributeShortcuts::VERSION = '0.027_01';
 
 # ABSTRACT: Shorthand for common attribute options
 
@@ -21,19 +21,22 @@ use namespace::autoclean;
 
 use Moose ();
 use Moose::Exporter;
+use Moose::Meta::TypeConstraint;
 use Moose::Util::MetaRole;
 use Moose::Util::TypeConstraints;
 
 {
     package MooseX::AttributeShortcuts::Trait::Attribute;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-# git description: 0.026-4-g9655ffa
-$MooseX::AttributeShortcuts::Trait::Attribute::VERSION = '0.027';
+# git description: 0.027-9-g78dcc28
+$MooseX::AttributeShortcuts::Trait::Attribute::VERSION = '0.027_01';
     use namespace::autoclean;
     use MooseX::Role::Parameterized;
     use Moose::Util::TypeConstraints  ':all';
     use MooseX::Types::Moose          ':all';
     use MooseX::Types::Common::String ':all';
+
+    use aliased 'MooseX::Meta::TypeConstraint::Mooish' => 'MooishTC';
 
     use List::AllUtils 'any';
 
@@ -96,131 +99,25 @@ $MooseX::AttributeShortcuts::Trait::Attribute::VERSION = '0.027';
             my $_opt = sub { $_has->(@_) ? $options->{$_[0]} : q{} };
             my $_ref = sub { ref $_opt->(@_) || q{}                };
 
-            if ($options->{is}) {
+            # handle: is => ...
+            $class->_mxas_is_rwp($name, $options, $_has, $_opt, $_ref);
+            $class->_mxas_is_lazy($name, $options, $_has, $_opt, $_ref);
 
-                # handle: is => 'rwp'
-                if ($options->{is} eq 'rwp') {
+            # handle: builder => 1, builder => sub { ... }
+            $class->_mxas_builder($name, $options, $_has, $_opt, $_ref);
 
-                    $options->{is}     = 'ro';
-                    $options->{writer} = "$wprefix$name";
-                }
+            # handle: isa_class, isa_role, isa_enum
+            $class->_mxas_isa_naughty($name, $options, $_has, $_opt, $_ref);
 
-                # handle: is => 'lazy'
-                if ($options->{is} eq 'lazy') {
+            # handle: isa_instance_of => ...
+            $class->_mxas_isa_instance_of($name, $options, $_has, $_opt, $_ref);
+            # handle: isa => sub { ... }
+            $class->_mxas_isa_mooish($name, $options, $_has, $_opt, $_ref);
 
-                    $options->{is}       = 'ro';
-                    $options->{lazy}     = 1;
-                    $options->{builder}  = 1
-                        unless $_has->('builder') || $_has->('default');
-                }
-            }
+            # handle: constraint => ...
+            $class->_mxas_constraint($name, $options, $_has, $_opt, $_ref);
+            $class->_mxas_coerce($name, $options, $_has, $_opt, $_ref);
 
-            if (any { exists $options->{$_} } (qw{ isa_class isa_role isa_enum })) {
-
-                # (more than) fair warning...
-                deprecated(
-                    feature => 'undocumented-isa-constraints',
-                    message => 'Naughty! isa_class, isa_role, and isa_enum will be removed on or after 01 July 2015!',
-                );
-
-                # XXX undocumented -- not sure this is a great idea
-                $options->{isa} = class_type(delete $options->{isa_class})
-                    if $_has->('isa_class');
-                $options->{isa} = role_type(delete $options->{isa_role})
-                    if $_has->('isa_role');
-                $options->{isa} = enum(delete $options->{isa_enum})
-                    if $_has->('isa_enum');
-            }
-
-            # aka: isa => class_type(...)
-            if ($_has->('isa_instance_of')) {
-
-                if ($_has->('isa')) {
-
-                    $class->throw_error(
-                        q{Cannot use 'isa_instance_of' and 'isa' together for attribute }
-                        . $_opt->('definition_context')->{package} . '::' . $name
-                    );
-                }
-
-                $options->{isa} = class_type(delete $options->{isa_instance_of});
-            }
-
-            ### the pretty business of on-the-fly subtyping...
-            my $our_type;
-
-            if ($_has->('constraint')) {
-
-                # check for errors...
-                $class->throw_error('You must specify an "isa" when declaring a "constraint"')
-                    if !$_has->('isa');
-                $class->throw_error('"constraint" must be a CODE reference')
-                    if $_ref->('constraint') ne 'CODE';
-
-                # constraint checking! XXX message, etc?
-                push my @opts, constraint => $_opt->('constraint')
-                    if $_ref->('constraint') eq 'CODE';
-
-                # stash our original option away and construct our new one
-                my $isa     = $options->{original_isa} = $_opt->('isa');
-                $our_type ||= _acquire_isa_tc($isa)->create_child_type(@opts);
-            }
-
-            # "fix" the case of the hashref....  *sigh*
-            if ($_ref->('coerce') eq 'HASH') {
-
-                deprecated(
-                    feature => 'hashref-given-to-coerce',
-                    message => 'Passing a hashref to coerce is unsafe, and will be removed on or after 01 Jan 2015',
-                );
-
-                $options->{coerce} = [ %{ $options->{coerce} } ];
-            }
-
-            if ($_ref->('coerce') eq 'ARRAY') {
-
-                ### must be type => sub { ... } pairs...
-                my @coercions = @{ $_opt->('coerce') };
-                confess 'You must specify an "isa" when declaring "coercion"'
-                    unless $_has->('isa');
-                confess 'coercion array must be in pairs!'
-                    if @coercions % 2;
-                confess 'must define at least one coercion pair!'
-                    unless @coercions > 0;
-
-                my $our_coercion = Moose::Meta::TypeCoercion->new;
-                $our_type ||= _acquire_isa_tc($_opt->('isa'))->create_child_type;
-
-                $our_coercion->add_type_coercions(@coercions);
-                $our_type->coercion($our_coercion);
-                $options->{coerce} = 1;
-            }
-
-            if ($our_type && !$our_type->has_coercion) {
-
-                my $isa_type = _acquire_isa_tc($_opt->('isa'));
-
-                if ($isa_type->has_coercion && !$_ref->('coerce') && $_opt->('coerce') eq "1") {
-
-                    # create our coercion as a copy of the parent
-                    $our_type->coercion(Moose::Meta::TypeCoercion->new(
-                        type_constraint   => $our_type,
-                        type_coercion_map => [ @{ $isa_type->coercion->type_coercion_map } ],
-                    ));
-                }
-
-            }
-
-            # fin constraint mucking....
-            do { $options->{original_isa} = $_opt->('isa'); $options->{isa} = $our_type }
-                if $our_type;
-
-            if ($options->{lazy_build} && $options->{lazy_build} eq 'private') {
-
-                $options->{lazy_build} = 1;
-                $options->{clearer}    = "_clear_$name";
-                $options->{predicate}  = "_has_$name";
-            }
 
             my $is_private = sub { $name =~ /^_/ ? $_[0] : $_[1] };
             my $default_for = sub {
@@ -238,19 +135,6 @@ $MooseX::AttributeShortcuts::Trait::Attribute::VERSION = '0.027';
                 return;
             };
 
-            # XXX install builder here if a coderef
-            if (defined $options->{builder}) {
-
-                #if (ref $_opt->('builder') eq 'CODE') {
-                if ((ref $options->{builder} || q{}) eq 'CODE') {
-
-                    $options->{_anon_builder} = $options->{builder};
-                    $options->{builder}       = 1;
-                }
-
-                $options->{builder} = "$bprefix$name"
-                    if $options->{builder} eq '1';
-            }
             ### set our other defaults, if requested...
             $default_for->($_) for qw{ predicate clearer };
             my $trigger = "$prefix{trigger}$name";
@@ -280,6 +164,203 @@ $MooseX::AttributeShortcuts::Trait::Attribute::VERSION = '0.027';
             return $self->$orig($name, %options);
         };
 
+        # handle: is => 'rwp'
+        method _mxas_is_rwp => sub {
+            my ($class, $name, $options, $_has, $_opt, $_ref) = @_;
+
+            return unless $_opt->('is') eq 'rwp';
+
+            $options->{is}     = 'ro';
+            $options->{writer} = "$wprefix$name";
+
+            return;
+        };
+
+        # handle: is => 'lazy'
+        method _mxas_is_lazy => sub {
+            my ($class, $name, $options, $_has, $_opt, $_ref) = @_;
+
+            return unless $_opt->('is') eq 'lazy';
+
+            $options->{is}       = 'ro';
+            $options->{lazy}     = 1;
+            $options->{builder}  = 1
+                unless $_has->('builder') || $_has->('default');
+
+            return;
+        };
+
+        # handle: lazy_build => 'private'
+        method _mxas_lazy_build_private => sub {
+            my ($class, $name, $options, $_has, $_opt, $_ref) = @_;
+
+            return unless $_opt->('lazy_build') eq 'private';
+
+            $options->{lazy_build} = 1;
+            $options->{clearer}    = "_clear_$name";
+            $options->{predicate}  = "_has_$name";
+
+            return;
+        };
+
+        # handle: isa_class, isa_role, isa_enum
+        method _mxas_isa_naughty => sub {
+            my ($class, $name, $options, $_has, $_opt, $_ref) = @_;
+
+            return unless
+                any { exists $options->{$_} } qw{ isa_class isa_role isa_enum };
+
+            # (more than) fair warning...
+            deprecated(
+                feature => 'undocumented-isa-constraints',
+                message => 'Naughty! isa_class, isa_role, and isa_enum will be removed on or after 01 July 2015!',
+            );
+
+            # XXX undocumented -- not sure this is a great idea
+            $options->{isa} = class_type(delete $options->{isa_class})
+                if $_has->('isa_class');
+            $options->{isa} = role_type(delete $options->{isa_role})
+                if $_has->('isa_role');
+            $options->{isa} = enum(delete $options->{isa_enum})
+                if $_has->('isa_enum');
+
+            return;
+        };
+
+        # handle: builder => 1, builder => sub { ... }
+        method _mxas_builder => sub {
+            my ($class, $name, $options, $_has, $_opt, $_ref) = @_;
+
+            return unless $_has->('builder');
+
+            if ($_ref->('builder') eq 'CODE') {
+
+                $options->{_anon_builder} = $options->{builder};
+                $options->{builder}       = 1;
+            }
+
+            $options->{builder} = "$bprefix$name"
+                if $options->{builder} eq '1';
+
+            return;
+        };
+
+        method _mxas_isa_mooish => sub {
+            my ($class, $name, $options, $_has, $_opt, $_ref) = @_;
+
+            return unless $_ref->('isa') eq 'CODE';
+
+            ### build a mooish type constraint...
+            $options->{original_isa} = $options->{isa};
+            $options->{isa} = MooishTC->new(constraint => $options->{isa});
+
+            return;
+        };
+
+        # handle: isa_instance_of => ...
+        method _mxas_isa_instance_of => sub {
+            my ($class, $name, $options, $_has, $_opt, $_ref) = @_;
+
+            return unless $_has->('isa_instance_of');
+
+            if ($_has->('isa')) {
+
+                $class->throw_error(
+                    q{Cannot use 'isa_instance_of' and 'isa' together for attribute }
+                    . $_opt->('definition_context')->{package} . '::' . $name
+                );
+            }
+
+            $options->{isa} = class_type(delete $options->{isa_instance_of});
+
+            return;
+        };
+
+        method _mxas_constraint => sub {
+            my ($class, $name, $options, $_has, $_opt, $_ref) = @_;
+
+            return unless $_has->('constraint');
+
+            # check for errors...
+            $class->throw_error('You must specify an "isa" when declaring a "constraint"')
+                if !$_has->('isa');
+            $class->throw_error('"constraint" must be a CODE reference')
+                if $_ref->('constraint') ne 'CODE';
+
+            # constraint checking! XXX message, etc?
+            push my @opts, constraint => $_opt->('constraint')
+                if $_ref->('constraint') eq 'CODE';
+
+            # stash our original option away and construct our new one
+            my $isa         = $options->{original_isa} = $_opt->('isa');
+            $options->{isa} = _acquire_isa_tc($isa)->create_child_type(@opts);
+
+            return;
+        };
+
+        method _mxas_coerce => sub {
+            my ($class, $name, $options, $_has, $_opt, $_ref) = @_;
+
+            # "fix" the case of the hashref....  *sigh*
+            if ($_ref->('coerce') eq 'HASH') {
+
+                deprecated(
+                    feature => 'hashref-given-to-coerce',
+                    message => 'Passing a hashref to coerce is unsafe, and will be removed on or after 01 Jan 2015',
+                );
+
+                $options->{coerce} = [ %{ $options->{coerce} } ];
+            }
+
+            if ($_ref->('coerce') eq 'ARRAY') {
+
+                ### must be type => sub { ... } pairs...
+                my @coercions = @{ $_opt->('coerce') };
+                confess 'You must specify an "isa" when declaring "coercion"'
+                    unless $_has->('isa');
+                confess 'coercion array must be in pairs!'
+                    if @coercions % 2;
+                confess 'must define at least one coercion pair!'
+                    unless @coercions > 0;
+
+                my $our_coercion = Moose::Meta::TypeCoercion->new;
+                my $our_type
+                    = $options->{original_isa}
+                    ? $options->{isa}
+                    : _acquire_isa_tc($_opt->('isa'))->create_child_type
+                    ;
+
+                $our_coercion->add_type_coercions(@coercions);
+                $our_type->coercion($our_coercion);
+
+                $options->{original_isa} ||= $options->{isa};
+                $options->{isa}            = $our_type;
+                $options->{coerce}         = 1;
+
+                return;
+            }
+
+            # If our original constraint has coercions and our created subtype
+            # did not have any (as specified in the 'coerce' option), then
+            # copy the parent's coercions over.
+
+            if ($_has->('original_isa') && $_opt->('coerce') eq '1') {
+
+                my $isa_type = _acquire_isa_tc($_opt->('original_isa'));
+
+                if ($isa_type->has_coercion) {
+
+                    # create our coercion as a copy of the parent
+                    $_opt->('isa')->coercion(Moose::Meta::TypeCoercion->new(
+                        type_constraint   => $_opt->('isa'),
+                        type_coercion_map => [ @{ $isa_type->coercion->type_coercion_map } ],
+                    ));
+                }
+
+            }
+
+            return;
+        };
 
         # we hijack attach_to_class in order to install our anon_builder, if
         # we have one.  Note that we don't go the normal
@@ -406,7 +487,7 @@ MooseX::AttributeShortcuts - Shorthand for common attribute options
 
 =head1 VERSION
 
-This document describes version 0.027 of MooseX::AttributeShortcuts - released March 10, 2015 as part of MooseX-AttributeShortcuts.
+This document describes version 0.027_01 of MooseX::AttributeShortcuts - released March 28, 2015 as part of MooseX-AttributeShortcuts.
 
 =head1 SYNOPSIS
 
@@ -544,6 +625,21 @@ Specifying C<builder =E<gt> 1> will cause the following options to be set:
 
     builder => "_build_$name"
 
+=head2 builder => sub { ... }
+
+Passing a coderef to builder will cause that coderef to be installed in the
+class this attribute is associated with the name you'd expect, and
+C<builder =E<gt> 1> to be set.
+
+e.g., in your class,
+
+    has foo => (is => 'ro', builder => sub { 'bar!' });
+
+...is effectively the same as...
+
+    has foo => (is => 'ro', builder => '_build_foo');
+    sub _build_foo { 'bar!' }
+
 =head2 clearer => 1
 
 Specifying C<clearer =E<gt> 1> will cause the following options to be set:
@@ -586,20 +682,84 @@ For an attribute named "_foo":
 This naming scheme, in which the trigger is always private, is the same as the
 builder naming scheme (just with a different prefix).
 
-=head2 builder => sub { ... }
+=head2 handles => { foo => sub { ... }, ... }
 
-Passing a coderef to builder will cause that coderef to be installed in the
-class this attribute is associated with the name you'd expect, and
-C<builder =E<gt> 1> to be set.
+Creating a delegation with a coderef will now create a new, "custom accessor"
+for the attribute.  These coderefs will be installed and called as methods on
+the associated class (just as readers, writers, and other accessors are), and
+will have the attribute metaclass available in $_.  Anything the accessor
+is called with it will have access to in @_, just as you'd expect of a method.
 
-e.g., in your class,
+e.g., the following example creates an attribute named 'bar' with a standard
+reader accessor named 'bar' and two custom accessors named 'foo' and
+'foo_too'.
 
-    has foo => (is => 'ro', builder => sub { 'bar!' });
+    has bar => (
 
-...is effectively the same as...
+        is      => 'ro',
+        isa     => 'Int',
+        handles => {
 
-    has foo => (is => 'ro', builder => '_build_foo');
-    sub _build_foo { 'bar!' }
+            foo => sub {
+                my $self = shift @_;
+
+                return $_->get_value($self) + 1;
+            },
+
+            foo_too => sub {
+                my $self = shift @_;
+
+                return $self->bar + 1;
+            },
+        },
+    );
+
+...and later,
+
+Note that in this example both foo() and foo_too() do effectively the same
+thing: return the attribute's current value plus 1.  However, foo() accesses
+the attribute value directly through the metaclass, the pros and cons of
+which this author leaves as an exercise for the reader to determine.
+
+You may choose to use the installed accessors to get at the attribute's value,
+or use the direct metaclass access, your choice.
+
+=head1 ANONYMOUS SUBTYPING AND COERCION
+
+    "Abusus non tollit usum."
+
+Note that we create new, anonymous subtypes whenever the constraint or
+coercion options are specified in such a way that the Shortcuts trait (this
+one) is invoked.  It's fully supported to use both constraint and coerce
+options at the same time.
+
+This facility is intended to assist with the creation of one-off type
+constraints and coercions.  It is not possible to deliberately reuse the
+subtypes we create, and if you find yourself using a particular isa /
+constraint / coerce option triplet in more than one place you should really
+think about creating a type that you can reuse.  L<MooseX::Types> provides
+the facilities to easily do this, or even a simple L<constant> definition at
+the package level with an anonymous type stashed away for local use.
+
+=head2 isa => sub { ... }
+
+    has foo => (
+        is  => 'rw',
+        # $_ == $_[0] == the value to be validated
+        isa => sub { die unless $_[0] == 1 },
+    );
+
+    # passes constraint
+    $thing->foo(1);
+
+    # fails constraint
+    $thing->foo(5);
+
+Given a coderef, create a type constraint for the attribute.  This constraint
+will fail if the coderef dies, and pass otherwise.
+
+Astute users will note that this is the same way L<Moo> constraints work; we
+use L<MooseX::Meta::TypeConstraint::Mooish> to implement the constraint.
 
 =head2 isa_instance_of => ...
 
@@ -673,65 +833,6 @@ coderefs that will coerce a given type to our type.
             Object => sub { 'An instance of ' . ref $_ },
         ],
     );
-
-=head2 handles => { foo => sub { ... }, ... }
-
-Creating a delegation with a coderef will now create a new, "custom accessor"
-for the attribute.  These coderefs will be installed and called as methods on
-the associated class (just as readers, writers, and other accessors are), and
-will have the attribute metaclass available in $_.  Anything the accessor
-is called with it will have access to in @_, just as you'd expect of a method.
-
-e.g., the following example creates an attribute named 'bar' with a standard
-reader accessor named 'bar' and two custom accessors named 'foo' and
-'foo_too'.
-
-    has bar => (
-
-        is      => 'ro',
-        isa     => 'Int',
-        handles => {
-
-            foo => sub {
-                my $self = shift @_;
-
-                return $_->get_value($self) + 1;
-            },
-
-            foo_too => sub {
-                my $self = shift @_;
-
-                return $self->bar + 1;
-            },
-        },
-    );
-
-...and later,
-
-Note that in this example both foo() and foo_too() do effectively the same
-thing: return the attribute's current value plus 1.  However, foo() accesses
-the attribute value directly through the metaclass, the pros and cons of
-which this author leaves as an exercise for the reader to determine.
-
-You may choose to use the installed accessors to get at the attribute's value,
-or use the direct metaclass access, your choice.
-
-=head1 ANONYMOUS SUBTYPING AND COERCION
-
-    "Abusus non tollit usum."
-
-Note that we create new, anonymous subtypes whenever the constraint or
-coercion options are specified in such a way that the Shortcuts trait (this
-one) is invoked.  It's fully supported to use both constraint and coerce
-options at the same time.
-
-This facility is intended to assist with the creation of one-off type
-constraints and coercions.  It is not possible to deliberately reuse the
-subtypes we create, and if you find yourself using a particular isa /
-constraint / coerce option triplet in more than one place you should really
-think about creating a type that you can reuse.  L<MooseX::Types> provides
-the facilities to easily do this, or even a simple L<constant> definition at
-the package level with an anonymous type stashed away for local use.
 
 =head1 SEE ALSO
 

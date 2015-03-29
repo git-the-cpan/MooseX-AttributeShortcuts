@@ -28,6 +28,7 @@ my @files = (
     't/inline_coercion.t',
     't/inline_subtyping.t',
     't/inline_subtyping_with_coercion.t',
+    't/isa-mooish.t',
     't/isa_instance_of.t'
 );
 
