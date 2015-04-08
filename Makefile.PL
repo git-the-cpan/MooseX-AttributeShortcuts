@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
   "NAME" => "MooseX::AttributeShortcuts",
   "PREREQ_PM" => {
     "List::AllUtils" => 0,
-    "Moose" => 0,
+    "Moose" => "1.14",
     "Moose::Exporter" => 0,
     "Moose::Meta::TypeConstraint" => 0,
     "Moose::Util::MetaRole" => 0,
@@ -59,7 +59,7 @@ my %WriteMakefileArgs = (
     "Test::Warn" => 0,
     "constant" => 0
   },
-  "VERSION" => "0.027_01",
+  "VERSION" => "0.027_02",
   "test" => {
     "TESTS" => "t/*.t t/deprecated/*.t"
   }
@@ -72,7 +72,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::AllUtils" => 0,
-  "Moose" => 0,
+  "Moose" => "1.14",
   "Moose::Exporter" => 0,
   "Moose::Meta::TypeConstraint" => 0,
   "Moose::Role" => 0,

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.75.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,19 +15,19 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 55ac697642a18dd7d974736a3d06fd531aa82382 .travis.yml
-SHA1 7ef2104215702c581dab04270f11b66de6174b7e Changes
+SHA1 0456ae1170501672ac81e69cfaf89812a3698c03 Changes
 SHA1 62c6886b1f14e9e9a39f6bf00f5490057d3c2885 LICENSE
 SHA1 7c1852f0ceaef5560285664440a473798b49b7bf MANIFEST
-SHA1 f8ee1dac307448e548944f3be6849b7b66aa3c3c META.json
-SHA1 63e616442a285c7f064a96939073e2dba8a1d33d META.yml
-SHA1 bfd37089d754c9377b8f14f14d3040610cb46e2c Makefile.PL
-SHA1 bb69faa93abc9fa3f56d3e4821536691db69bd12 README
-SHA1 234ed777b9285a8ee387449651a6b3abc9deeb4b cpanfile
+SHA1 c65ca0f1d892b0c1bcf5944904aec2c3b9373b1f META.json
+SHA1 4a3b1dcedbac55c6dfd8309bc0f1163c1add2e74 META.yml
+SHA1 514077ef6e60867e132412cd7e803e0dd44847aa Makefile.PL
+SHA1 8eaaa6efc15a197081b3b38ab4382d92185f888a README
+SHA1 b4570359a04fc7426d8c2fa689566c45c1b4213c cpanfile
 SHA1 5dafee4fc2c3642d0de8db57ec01d89d67fa5979 dist.ini
-SHA1 16cb992cccc84dd3c7741bdc967cd36afc5efee5 lib/MooseX/AttributeShortcuts.pm
+SHA1 11e18c66ab532d33b4f2c18d6d5ad8fd1b624eab lib/MooseX/AttributeShortcuts.pm
 SHA1 c522c3928158e64bd97d34d20cbfe0b5305a7eb2 t/00-check-deps.t
-SHA1 9cc17cd54fa557710a3e0964b2d49654dd35b7b2 t/00-compile.t
-SHA1 2614394654dfd9d06b5c36b501d3df45ba630236 t/000-report-versions-tiny.t
+SHA1 761bc6c1796b43db176c6ed2efedfa2a9be74ed2 t/00-compile.t
+SHA1 4c280df2e0a943f1a075f4ab6df64fdb6015f80f t/000-report-versions-tiny.t
 SHA1 b201b29194c8e2d174032993fbf9b989d204943c t/01-basic.t
 SHA1 feb9ac405e94777b2eccb564c75e81b303877592 t/02-parameterized.t
 SHA1 8b3de3014b22392c176c297ec6169376b4c7d080 t/03-lazy.t
@@ -60,17 +60,17 @@ SHA1 a0c20421984c072fd1701d1639592f2d7c4ff226 xt/release/pod-syntax.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iQIcBAEBAgAGBQJVF4deAAoJEJ/Rlq0N/NXWrV8P/jJVRDxkH/zvi37diD4jwrow
-mTUBAagTnapzMxv0H/M6VY5sEyzZqE+nGWkLwpsyi3ei9AV7FzBIDWpaNCoW7oxa
-JXg6o13wZPgasq11myK+Qn3RHild5/Us/YpqSgbpgUMI67pj+77iD2d4r6/jHqyb
-WlvjG+ZPP1IY5qoc4pKZcx9LVhnE/g6BWA/QCuxxtILB1nKyG73I4DXWsqOy49n1
-wSco09//jIQjrU5K4TtTZ0KZqL05O9+kXGeXyr8OqIrjuRm4JbuUeutopPJ5R3wY
-0l8OWYkUjlgy+7/qM+LoI8ExRKTZ+wWFMsn40w2mWOsDcoYUSU7Gg7qYBW5hDEYu
-ltqsOgovvdRDvJ3jLXWBNBOZJGUNdhrJ2n55kkc+paf9XjGMdlCUHH+vrlJls2XL
-BXa2YdrRoPJGitGPovHRIRmfXaOnL8048jitoVwcaqFaSOTPmrulxgF8K0RtNdfT
-mTntRLe7Bo5McIi1hMSMtusOhW9MZy60Twy8uP+tAM3U+4ZezbYpEpNshRO/3/Xr
-z+GoMTK2nj1GWXDG8BoE4YzJT4EqX09QcszWGM9UtXsrixBMQahPxN7mLaJYCi55
-JO2sCDfyygEOwi5DqkuN4bTmhCRKhB/NsvwgeS6XCBwXMxRzYnzhN1hCpVae/kwa
-rdpGRELuZJ22vAtnKdLH
-=UQTd
+iQIcBAEBAgAGBQJVJKPcAAoJEJ/Rlq0N/NXW1+IP/Rtu+j1go8XtF+HEoFpYxeho
+Znw5pXGvMe8b7c0eBh24tpocnE+npBjKnTEjQeybEXHR7oa6i9GkjGmrGojx0v/X
+baGY3jY/Jn28qMLb9nefk4ZiW+e85WPVG69J79yvtPMybkGDfVL9hvL0we4rm9ku
+qe2Y2qS+rGMrPJkvpCTLT4gZ07nwNDjekgQ8S6V7IBD5lpgIj65ep/7vK+Qvkrx7
+pNfLQ+ao0dXPvUyPBiQCEsko5xdvOndL6VeQ0iGYoId619t+dmJNVhK5m9N7MvhH
+3ZaoIJjwn4RWEJIG5cjTlHgjGO2pvn6EycA0h1mFlZzjBqQNoFpcU9dihN9U2OIo
+XBpgYBhZyfWRsDuU35ruqkZqCM6e2Vn7N10TfmhYmcstchfOmULI8zgGOkiiUiU9
+FJqDg/yZShGxrr2LV8/UiZRzhbCbV7h9LAkYOODcOGCcbb79R1swrc0M/S5NQ4Zj
+Sh0vQUU6y6Vi6+8cVdV6lqR4RYmGcBEo+Cv8V1902U8VXQoksrDSIPRSaGLat5fr
+wMWEDgUh6OxhXdXMhtv/9E/yFyw8f57Xl0zYk4vK2TtWFk5nxUvnR7Im3w94FIiF
+CkNUARKfTEIIOwONPRGZi6zRAMLQe75NR4ZprF5D5adOq1R/lwrdPoFXI7waMlhN
+GRJ7cTbir2+fDAXGGZYO
+=cXvD
 -----END PGP SIGNATURE-----

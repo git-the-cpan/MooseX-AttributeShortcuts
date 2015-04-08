@@ -35,13 +35,13 @@ no_index:
 provides:
   MooseX::AttributeShortcuts:
     file: lib/MooseX/AttributeShortcuts.pm
-    version: 0.027_01
+    version: 0.027_02
   MooseX::AttributeShortcuts::Trait::Attribute:
     file: lib/MooseX/AttributeShortcuts.pm
-    version: 0.027_01
+    version: 0.027_02
 requires:
   List::AllUtils: '0'
-  Moose: '0'
+  Moose: '1.14'
   Moose::Exporter: '0'
   Moose::Meta::TypeConstraint: '0'
   Moose::Util::MetaRole: '0'
@@ -60,7 +60,7 @@ resources:
   bugtracker: https://github.com/RsrchBoy/moosex-attributeshortcuts/issues
   homepage: https://github.com/RsrchBoy/moosex-attributeshortcuts
   repository: https://github.com/RsrchBoy/moosex-attributeshortcuts.git
-version: 0.027_01
+version: 0.027_02
 x_Dist_Zilla:
   perl:
     version: '5.020001'
@@ -79,7 +79,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::Repo:
           repo_root: .
       name: '@RSRCHBOY/Git::NextVersion'
-      version: '2.031'
+      version: '2.033'
     -
       class: Dist::Zilla::Plugin::ContributorsFromGit
       name: '@RSRCHBOY/ContributorsFromGit'
@@ -239,7 +239,7 @@ x_Dist_Zilla:
             - ':ExecFiles'
           skips: []
       name: '@RSRCHBOY/Test::Compile'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::NoSmartCommentsTests
       name: '@RSRCHBOY/NoSmartCommentsTests'
@@ -309,7 +309,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CheckChangesHasContent
       name: '@RSRCHBOY/CheckChangesHasContent'
-      version: '0.007'
+      version: '0.008'
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
       name: '@RSRCHBOY/CheckPrereqsIndexed'
@@ -346,7 +346,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::Repo:
           repo_root: .
       name: '@RSRCHBOY/Git::Check'
-      version: '2.031'
+      version: '2.033'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -369,7 +369,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::Repo:
           repo_root: .
       name: '@RSRCHBOY/Git::Commit'
-      version: '2.031'
+      version: '2.033'
     -
       class: Dist::Zilla::Plugin::Test::CheckDeps
       name: '@RSRCHBOY/Test::CheckDeps'
@@ -380,8 +380,11 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::CheckSelfDependency:
           finder:
             - ':InstallModules'
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000026'
+          version: '0.003'
       name: '@RSRCHBOY/CheckSelfDependency'
-      version: '0.010'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::Travis::ConfigForReleaseBranch
       name: '@RSRCHBOY/Travis::ConfigForReleaseBranch'
@@ -396,14 +399,14 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Tag:
           branch: ~
           signed: '1'
-          tag: 0.027_01
+          tag: 0.027_02
           tag_format: '%v'
           tag_message: v%v
           time_zone: local
         Dist::Zilla::Role::Git::Repo:
           repo_root: .
       name: '@RSRCHBOY/Git::Tag'
-      version: '2.031'
+      version: '2.033'
     -
       class: Dist::Zilla::Plugin::Git::CommitBuild
       config:
@@ -417,7 +420,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::Repo:
           repo_root: .
       name: '@RSRCHBOY/Git::CommitBuild::Build'
-      version: '2.031'
+      version: '2.033'
     -
       class: Dist::Zilla::Plugin::Git::CommitBuild
       config:
@@ -431,7 +434,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::Repo:
           repo_root: .
       name: '@RSRCHBOY/Git::CommitBuild::Release'
-      version: '2.031'
+      version: '2.033'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -443,7 +446,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::Repo:
           repo_root: .
       name: '@RSRCHBOY/Git::Push'
-      version: '2.031'
+      version: '2.033'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@RSRCHBOY/UploadToCPAN'

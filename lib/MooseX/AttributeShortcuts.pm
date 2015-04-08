@@ -9,8 +9,8 @@
 #
 package MooseX::AttributeShortcuts;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-# git description: 0.027-9-g78dcc28
-$MooseX::AttributeShortcuts::VERSION = '0.027_01';
+# git description: 0.027_01-1-ge44c93e
+$MooseX::AttributeShortcuts::VERSION = '0.027_02';
 
 # ABSTRACT: Shorthand for common attribute options
 
@@ -19,7 +19,7 @@ use warnings;
 
 use namespace::autoclean;
 
-use Moose ();
+use Moose 1.14 ();
 use Moose::Exporter;
 use Moose::Meta::TypeConstraint;
 use Moose::Util::MetaRole;
@@ -28,8 +28,8 @@ use Moose::Util::TypeConstraints;
 {
     package MooseX::AttributeShortcuts::Trait::Attribute;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-# git description: 0.027-9-g78dcc28
-$MooseX::AttributeShortcuts::Trait::Attribute::VERSION = '0.027_01';
+# git description: 0.027_01-1-ge44c93e
+$MooseX::AttributeShortcuts::Trait::Attribute::VERSION = '0.027_02';
     use namespace::autoclean;
     use MooseX::Role::Parameterized;
     use Moose::Util::TypeConstraints  ':all';
@@ -487,7 +487,7 @@ MooseX::AttributeShortcuts - Shorthand for common attribute options
 
 =head1 VERSION
 
-This document describes version 0.027_01 of MooseX::AttributeShortcuts - released March 28, 2015 as part of MooseX-AttributeShortcuts.
+This document describes version 0.027_02 of MooseX::AttributeShortcuts - released April 07, 2015 as part of MooseX-AttributeShortcuts.
 
 =head1 SYNOPSIS
 
