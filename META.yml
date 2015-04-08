@@ -35,10 +35,10 @@ no_index:
 provides:
   MooseX::AttributeShortcuts:
     file: lib/MooseX/AttributeShortcuts.pm
-    version: 0.027_02
+    version: '0.028'
   MooseX::AttributeShortcuts::Trait::Attribute:
     file: lib/MooseX/AttributeShortcuts.pm
-    version: 0.027_02
+    version: '0.028'
 requires:
   List::AllUtils: '0'
   Moose: '1.14'
@@ -60,7 +60,7 @@ resources:
   bugtracker: https://github.com/RsrchBoy/moosex-attributeshortcuts/issues
   homepage: https://github.com/RsrchBoy/moosex-attributeshortcuts
   repository: https://github.com/RsrchBoy/moosex-attributeshortcuts.git
-version: 0.027_02
+version: '0.028'
 x_Dist_Zilla:
   perl:
     version: '5.020001'
@@ -399,7 +399,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Tag:
           branch: ~
           signed: '1'
-          tag: 0.027_02
+          tag: '0.028'
           tag_format: '%v'
           tag_message: v%v
           time_zone: local

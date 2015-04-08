@@ -59,7 +59,7 @@ my %WriteMakefileArgs = (
     "Test::Warn" => 0,
     "constant" => 0
   },
-  "VERSION" => "0.027_02",
+  "VERSION" => "0.028",
   "test" => {
     "TESTS" => "t/*.t t/deprecated/*.t"
   }

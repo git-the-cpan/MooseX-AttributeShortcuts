@@ -81,14 +81,14 @@
    "provides" : {
       "MooseX::AttributeShortcuts" : {
          "file" : "lib/MooseX/AttributeShortcuts.pm",
-         "version" : "0.027_02"
+         "version" : "0.028"
       },
       "MooseX::AttributeShortcuts::Trait::Attribute" : {
          "file" : "lib/MooseX/AttributeShortcuts.pm",
-         "version" : "0.027_02"
+         "version" : "0.028"
       }
    },
-   "release_status" : "testing",
+   "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "web" : "https://github.com/RsrchBoy/moosex-attributeshortcuts/issues"
@@ -100,7 +100,7 @@
          "web" : "https://github.com/RsrchBoy/moosex-attributeshortcuts"
       }
    },
-   "version" : "0.027_02",
+   "version" : "0.028",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.020001"
@@ -539,7 +539,7 @@
                "Dist::Zilla::Plugin::Git::Tag" : {
                   "branch" : null,
                   "signed" : "1",
-                  "tag" : "0.027_02",
+                  "tag" : "0.028",
                   "tag_format" : "%v",
                   "tag_message" : "v%v",
                   "time_zone" : "local"
